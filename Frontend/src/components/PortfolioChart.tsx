@@ -22,7 +22,7 @@ interface StockPerformance {
 
 export function PortfolioChart() {
   const { data: holdings } = useQuery<StockPerformance[]>('holdings', async () => {
-    const response = await fetch('http://localhost:4001/api/portfolio')
+    const response = await fetch('http://localhost:8001/api/portfolio')
     if (!response.ok) {
       throw new Error('Failed to fetch portfolio data')
     }

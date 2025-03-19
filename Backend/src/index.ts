@@ -16,8 +16,10 @@ server.register(require('@fastify/formbody'));
 
 // Enable CORS
 server.register(require('@fastify/cors'), {
-  origin: process.env.FRONTEND_URL || 'http://localhost:3000',
-  credentials: true
+  origin: true, // Allow all origins
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization']
 });
 
 // Register routes

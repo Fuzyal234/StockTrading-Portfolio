@@ -34,7 +34,7 @@ export function AddTradeModal({ isOpen, onClose }: AddTradeModalProps) {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     try {
-      const response = await fetch('http://localhost:4001/api/trades', {
+      const response = await fetch('http://localhost:8001/api/trades', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
