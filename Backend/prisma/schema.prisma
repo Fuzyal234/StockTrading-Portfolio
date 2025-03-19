@@ -1,0 +1,85 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+  previewFeatures = ["views"]
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(uuid())
+  email     String   @unique
+  password  String
+  name      String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  trades    Trade[]
+  portfolio Portfolio?
+}
+
+model Stock {
+  id            String   @id @default(uuid())
+  symbol        String   @unique
+  companyName   String
+  currentPrice  Decimal  @db.Decimal(10, 2)
+  lastUpdated   DateTime @default(now())
+  trades        Trade[]
+  portfolioStocks PortfolioStock[]
+}
+
+model Trade {
+  id        String   @id @default(uuid())
+  userId    String
+  stockId   String
+  type      TradeType
+  quantity  Int
+  price     Decimal  @db.Decimal(10, 2)
+  timestamp DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id])
+  stock     Stock    @relation(fields: [stockId], references: [id])
+}
+
+model Portfolio {
+  id              String   @id @default(uuid())
+  userId          String   @unique
+  totalValue      Decimal  @db.Decimal(10, 2)
+  totalProfit    Decimal  @db.Decimal(10, 2)
+  lastUpdated     DateTime @default(now())
+  user            User     @relation(fields: [userId], references: [id])
+  stocks          PortfolioStock[]
+}
+
+model PortfolioStock {
+  id          String   @id @default(uuid())
+  portfolioId String
+  stockId     String
+  quantity    Int
+  avgPrice    Decimal  @db.Decimal(10, 2)
+  currentValue Decimal @db.Decimal(10, 2)
+  profit      Decimal  @db.Decimal(10, 2)
+  portfolio   Portfolio @relation(fields: [portfolioId], references: [id])
+  stock       Stock    @relation(fields: [stockId], references: [id])
+
+  @@unique([portfolioId, stockId])
+}
+
+enum TradeType {
+  BUY
+  SELL
+}
+
+view PortfolioSummary {
+  symbol              String  @unique
+  totalQuantity       Int
+  averagePrice       Float
+  totalInvestment    Float
+  currentPrice       Float?
+  totalValue         Float?
+  profitLoss         Float?
+  profitLossPercent  Float?
+} 

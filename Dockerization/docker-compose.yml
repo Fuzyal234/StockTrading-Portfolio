@@ -1,0 +1,56 @@
+version: '3.8'
+services:
+  stock-market-db:
+    image: postgres:17
+    container_name: stock-market-db
+    restart: always
+    networks:
+      - stock-market-network
+    ports:
+      - "5435:5432"
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=stock_portfolio
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    env_file:
+      - docker-compose.env
+
+  stock-market-backend:
+    build:
+      context: ../Backend
+      dockerfile: Dockerfile
+    container_name: stock-market-backend
+    depends_on:
+      - stock-market-db
+    ports:
+      - "8001:8001"
+      - "9299:9229"
+    networks:
+      - stock-market-network
+    restart: unless-stopped
+    environment:
+      - DATABASE_USER=postgres
+      - DATABASE_PASSWORD=postgres
+      - DATABASE_NAME=stock_portfolio
+      - DATABASE_PORT=5432
+      - DATABASE_HOST=stock-market-db
+      - DATABASE_URL=postgresql://postgres:postgres@stock-market-db:5432/stock_portfolio?schema=public
+      - NODE_ENV=development
+      - API_PORT=8001
+      - JWT_SECRET=your-super-secret-key-change-this-in-production
+      - FRONTEND_URL=http://localhost:3000
+      - CORS_ORIGIN=http://localhost:3000
+    volumes:
+      - ../Backend:/app
+      - /app/node_modules
+    command: npm run dev
+
+volumes:
+  postgres_data:
+    driver: local
+
+networks:
+  stock-market-network:
+    driver: bridge 

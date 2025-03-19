@@ -1,0 +1,74 @@
+{
+  "name": "stock-market-backend",
+  "version": "1.0.0",
+  "description": "Stock Trading Portfolio Backend",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "tsc --build",
+    "dev": "env-cmd -e development nodemon --inspect=0.0.0.0:9333 src/index.ts",
+    "lint": "eslint 'src/**/*.{js,ts}'",
+    "start": "ts-node src/index.ts",
+    "prisma:generate": "prisma generate",
+    "prisma:migrate": "prisma migrate dev",
+    "prisma:studio": "prisma studio"
+  },
+  "keywords": [
+    "stock-trading",
+    "portfolio-management"
+  ],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@fastify/cors": "^11.0.0",
+    "@fastify/formbody": "^8.0.2",
+    "@fastify/jwt": "^9.0.1",
+    "@prisma/client": "^5.10.0",
+    "@sinclair/typebox": "^0.34.11",
+    "@types/nodemailer": "^6.4.17",
+    "@types/uuid": "^10.0.0",
+    "@types/winston": "^2.4.4",
+    "argon2": "^0.41.1",
+    "axios": "^1.7.8",
+    "cors": "^2.8.5",
+    "date-fns": "^2.30.0",
+    "decimal.js": "^10.4.3",
+    "fastify": "^5.2.1",
+    "joi": "^17.13.3",
+    "jsonwebtoken": "^9.0.2",
+    "nodemailer": "^6.10.0",
+    "pg": "^8.13.1",
+    "sequelize": "^6.37.6",
+    "uuid": "^11.1.0",
+    "winston": "^3.17.0",
+    "zod": "^3.24.2"
+  },
+  "devDependencies": {
+    "@types/cors": "^2.8.17",
+    "@types/jsonwebtoken": "^9.0.7",
+    "@types/node": "^22.10.2",
+    "@types/pg": "^8.11.10",
+    "@typescript-eslint/eslint-plugin": "^8.17.0",
+    "@typescript-eslint/parser": "^8.17.0",
+    "env-cmd": "^10.1.0",
+    "eslint": "^9.16.0",
+    "nodemon": "^3.1.7",
+    "prisma": "^5.10.0",
+    "ts-node": "^10.9.2",
+    "tsconfig-paths": "4.2.0",
+    "typescript": "^5.7.2"
+  },
+  "nodemonConfig": {
+    "watch": [
+      "src/**"
+    ],
+    "ext": "ts,json",
+    "ignore": [
+      ".git",
+      "node_modules/**/node_modules",
+      "src/**/*.spec.ts"
+    ],
+    "execMap": {
+      "ts": "node --require ts-node/register -r tsconfig-paths/register"
+    }
+  }
+}
