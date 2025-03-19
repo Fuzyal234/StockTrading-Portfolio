@@ -7,11 +7,14 @@ WORKDIR /app
 COPY package.json package-lock.json ./
 COPY prisma ./prisma/
 
-RUN npm install 
+# Install all dependencies including devDependencies
+RUN npm install
 RUN npx prisma generate
 
+# Copy the rest of the application
 COPY . .
 
 EXPOSE 8001
 
+# Use the development script
 CMD ["npm", "run", "dev"]

@@ -9,8 +9,10 @@ import {
   Td,
   TableContainer,
   Text,
+  Box,
+  Heading,
 } from '@chakra-ui/react'
-import { useQuery } from 'react-query'
+import { useQuery } from '@tanstack/react-query'
 
 interface StockHolding {
   symbol: string
@@ -23,50 +25,48 @@ interface StockHolding {
 }
 
 export function PortfolioTable() {
-  const { data: holdings, isLoading } = useQuery<StockHolding[]>('holdings', async () => {
-    const response = await fetch('http://localhost:8001/api/portfolio')
-    if (!response.ok) {
-      throw new Error('Failed to fetch portfolio data')
+  const { data: holdings } = useQuery<StockHolding[]>({
+    queryKey: ['holdings'],
+    queryFn: async () => {
+      const response = await fetch('http://localhost:8001/api/portfolio')
+      if (!response.ok) {
+        throw new Error('Failed to fetch portfolio data')
+      }
+      return response.json()
     }
-    return response.json()
   })
 
-  if (isLoading) {
-    return <Text>Loading portfolio data...</Text>
-  }
-
   return (
-    <TableContainer>
+    <Box>
+      <Heading size="md" mb={4}>Portfolio Holdings</Heading>
       <Table variant="simple">
         <Thead>
           <Tr>
             <Th>Symbol</Th>
-            <Th isNumeric>Quantity</Th>
-            <Th isNumeric>Avg. Price</Th>
+            <Th isNumeric>Shares</Th>
+            <Th isNumeric>Average Price</Th>
             <Th isNumeric>Current Price</Th>
             <Th isNumeric>Total Value</Th>
             <Th isNumeric>Profit/Loss</Th>
-            <Th isNumeric>P/L %</Th>
           </Tr>
         </Thead>
         <Tbody>
-          {holdings?.map((holding) => (
+          {holdings?.map((holding: StockHolding) => (
             <Tr key={holding.symbol}>
               <Td>{holding.symbol}</Td>
               <Td isNumeric>{holding.quantity}</Td>
               <Td isNumeric>${holding.averagePrice.toFixed(2)}</Td>
               <Td isNumeric>${holding.currentPrice.toFixed(2)}</Td>
               <Td isNumeric>${holding.totalValue.toFixed(2)}</Td>
-              <Td isNumeric color={holding.profitLoss >= 0 ? 'green.500' : 'red.500'}>
-                ${Math.abs(holding.profitLoss).toFixed(2)}
-              </Td>
-              <Td isNumeric color={holding.profitLossPercentage >= 0 ? 'green.500' : 'red.500'}>
-                {holding.profitLossPercentage.toFixed(2)}%
+              <Td isNumeric>
+                <Text color={holding.profitLoss >= 0 ? 'green.500' : 'red.500'}>
+                  ${holding.profitLoss.toFixed(2)}
+                </Text>
               </Td>
             </Tr>
           ))}
         </Tbody>
       </Table>
-    </TableContainer>
+    </Box>
   )
 } 

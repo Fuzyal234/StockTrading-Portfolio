@@ -11,7 +11,7 @@ import {
   ResponsiveContainer,
 } from 'recharts'
 import { Box, Heading } from '@chakra-ui/react'
-import { useQuery } from 'react-query'
+import { useQuery } from '@tanstack/react-query'
 
 interface StockPerformance {
   symbol: string
@@ -21,12 +21,15 @@ interface StockPerformance {
 }
 
 export function PortfolioChart() {
-  const { data: holdings } = useQuery<StockPerformance[]>('holdings', async () => {
-    const response = await fetch('http://localhost:8001/api/portfolio')
-    if (!response.ok) {
-      throw new Error('Failed to fetch portfolio data')
+  const { data: holdings } = useQuery({
+    queryKey: ['holdings'],
+    queryFn: async () => {
+      const response = await fetch('http://localhost:8001/api/portfolio')
+      if (!response.ok) {
+        throw new Error('Failed to fetch portfolio data')
+      }
+      return response.json()
     }
-    return response.json()
   })
 
   return (
@@ -35,7 +38,7 @@ export function PortfolioChart() {
       <Box height="400px">
         <ResponsiveContainer width="100%" height="100%">
           <BarChart
-            data={holdings}
+            data={holdings || []}
             margin={{
               top: 20,
               right: 30,

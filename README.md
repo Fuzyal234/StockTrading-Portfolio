@@ -1,83 +1,136 @@
 # Stock Trading Portfolio
 
-A full-stack application for managing stock trading portfolios with real-time calculations and visualizations.
+A modern web application for managing and tracking your stock trading portfolio. Built with Next.js, Fastify, and Prisma.
 
 ## Features
 
-- Record buy and sell transactions
-- Calculate total portfolio value
-- Track profit/loss per stock and overall portfolio
-- Visualize portfolio metrics
-- Real-time updates of stock prices
-- Materialized views for efficient calculations
+- Real-time portfolio tracking
+- Trade management (buy/sell)
+- Portfolio analytics and charts
+- User authentication
+- Responsive design
+- Dark/Light mode support
 
 ## Tech Stack
 
-- Frontend: Next.js with Chakra UI
-- Backend: Node.js with Fastify
-- Database: PostgreSQL with Prisma
-- Containerization: Docker
+### Frontend
+- Next.js 14
+- TypeScript
+- Chakra UI
+- React Query
+- Recharts
+- Axios
 
-## Setup Instructions
-
-### Prerequisites
-
-- Node.js (v18 or later)
+### Backend
+- Fastify
+- TypeScript
+- Prisma ORM
 - PostgreSQL
-- Docker (optional)
+- JWT Authentication
+- Pino Logger
 
-### Backend Setup
+## Prerequisites
 
-1. Navigate to the Backend directory:
-   ```bash
-   cd Backend
-   ```
+- Node.js 18+
+- PostgreSQL
+- npm or yarn
+
+## Getting Started
+
+1. Clone the repository:
+```bash
+git clone https://github.com/yourusername/stocktrading-portfolio.git
+cd stocktrading-portfolio
+```
 
 2. Install dependencies:
-   ```bash
-   npm install
-   ```
+```bash
+# Install frontend dependencies
+cd Frontend
+npm install
 
-3. Set up the environment variables:
-   ```bash
-   cp .env.example .env
-   # Edit .env with your database credentials
-   ```
+# Install backend dependencies
+cd ../Backend
+npm install
+```
+
+3. Set up environment variables:
+```bash
+# Frontend (.env.local)
+NEXT_PUBLIC_API_URL=http://localhost:8001
+
+# Backend (.env)
+DATABASE_URL="postgresql://user:password@localhost:5432/stocktrading"
+JWT_SECRET="your-secret-key"
+PORT=8001
+```
 
 4. Set up the database:
-   ```bash
-   npm run prisma:migrate
-   npm run prisma:generate
-   ```
+```bash
+cd Backend
+npx prisma generate
+npx prisma migrate dev
+```
 
-5. Start the backend server:
-   ```bash
-   npm run dev
-   ```
+5. Start the development servers:
+```bash
+# Start backend server
+cd Backend
+npm run dev
 
-### Frontend Setup
+# Start frontend server (in a new terminal)
+cd Frontend
+npm run dev
+```
 
-1. Navigate to the Frontend directory:
-   ```bash
-   cd Frontend
-   ```
+The application will be available at:
+- Frontend: http://localhost:3000
+- Backend: http://localhost:8001
 
-2. Install dependencies:
-   ```bash
-   npm install
-   ```
+## Project Structure
 
-3. Start the frontend development server:
-   ```bash
-   npm run dev
-   ```
+```
+stocktrading-portfolio/
+├── Frontend/
+│   ├── src/
+│   │   ├── app/          # Next.js app directory
+│   │   │   ├── components/   # React components
+│   │   │   ├── hooks/        # Custom React hooks
+│   │   │   ├── lib/          # Utility functions and API client
+│   │   │   └── services/     # API services
+│   │   └── public/           # Static assets
+│   ├── Backend/
+│   │   ├── src/
+│   │   │   ├── controllers/  # Route controllers
+│   │   │   ├── models/       # Data models
+│   │   │   ├── routes/       # API routes
+│   │   │   ├── utils/        # Utility functions
+│   │   │   └── validation/   # Request validation
+│   │   └── prisma/          # Database schema and migrations
+│   └── Dockerization/       # Docker configuration
+```
 
-### Docker Setup (Optional)
+## API Documentation
 
-1. Build and start the containers:
-   ```bash
-   docker-compose up -d
-   ```
+The API documentation is available at `/api/docs` when running the backend server.
+
+## Contributing
+
+1. Fork the repository
+2. Create your feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add some amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
+
+## License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## Acknowledgments
+
+- [Chakra UI](https://chakra-ui.com/) for the beautiful components
+- [Fastify](https://www.fastify.io/) for the fast and low overhead web framework
+- [Prisma](https://www.prisma.io/) for the type-safe ORM
 
 ## API Endpoints
 

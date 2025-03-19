@@ -1,22 +1,37 @@
 import { FastifyInstance, FastifyRequest } from 'fastify';
-import { PrismaClient, Trade, Portfolio, Stock, Prisma } from '@prisma/client';
+import { PrismaClient, Prisma } from '@prisma/client';
 
 const prisma = new PrismaClient();
 
-interface TradeWithStock extends Trade {
-  stock: Stock;
+interface TradeWithStock {
+  id: number;
+  userId: number;
+  stockId: number;
+  quantity: number;
+  price: number;
+  type: 'BUY' | 'SELL';
+  timestamp: Date;
+  stock: {
+    id: number;
+    symbol: string;
+    name: string;
+    quantity: number;
+    purchasePrice: number;
+    portfolioId: number;
+  };
 }
 
-interface PortfolioWithStocks extends Portfolio {
+interface PortfolioWithStocks {
+  id: number;
+  name: string;
+  userId: number;
   stocks: Array<{
-    id: string;
-    portfolioId: string;
-    stockId: string;
+    id: number;
+    symbol: string;
+    name: string;
     quantity: number;
-    avgPrice: Prisma.Decimal;
-    currentValue: Prisma.Decimal;
-    profit: Prisma.Decimal;
-    stock: Stock;
+    purchasePrice: number;
+    portfolioId: number;
   }>;
 }
 
