@@ -9,11 +9,11 @@ services:
     ports:
       - "5435:5432"
     environment:
-      - POSTGRES_USER=postgres
+      - POSTGRES_USER=stock-market-user
       - POSTGRES_PASSWORD=postgres
-      - POSTGRES_DB=stock_portfolio
+      - POSTGRES_DB=stock_portfolio 
     volumes:
-      - postgres_data:/var/lib/postgresql/data
+      - ./data-postgres:/var/lib/postgresql/data/
  
 
   stock-market-backend:
@@ -30,12 +30,12 @@ services:
       - stock-market-network
     restart: unless-stopped
     environment:
-      - DATABASE_USER=postgres
+      - DATABASE_USER=stock-market-user
       - DATABASE_PASSWORD=postgres
       - DATABASE_NAME=stock_portfolio
       - DATABASE_PORT=5432
       - DATABASE_HOST=stock-market-db
-      - DATABASE_URL=postgresql://postgres:postgres@stock-market-db:5432/stock_portfolio?schema=public
+      - DATABASE_URL=
       - NODE_ENV=development
       - API_PORT=8001
       - JWT_SECRET=your-super-secret-key-change-this-in-production
@@ -47,7 +47,7 @@ services:
     command: npm run dev
 
 volumes:
-  postgres_data:
+  data-postgres:
     driver: local
 
 networks:
