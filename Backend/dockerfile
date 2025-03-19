@@ -5,11 +5,13 @@ RUN apt-get update -y && apt-get install -y openssl
 WORKDIR /app
 
 COPY package.json package-lock.json ./
+COPY prisma ./prisma/
 
 RUN npm install 
 RUN npx prisma generate
+
 COPY . .
 
 EXPOSE 8001
 
-CMD ["npm", "start","dev"]
+CMD ["npm", "run", "dev"]

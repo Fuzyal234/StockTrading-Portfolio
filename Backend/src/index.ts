@@ -36,7 +36,7 @@ const start = async () => {
       port: parseInt(process.env.PORT || '8001'), 
       host: '0.0.0.0' 
     });
-    console.log(`Server is running on ${server.server.address()}`);
+    console.log(`Server is running on ${process.env.PORT}`);
   } catch (err) {
     server.log.error(err);
     process.exit(1);

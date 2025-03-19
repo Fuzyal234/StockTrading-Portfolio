@@ -1,9 +1,6 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
 generator client {
-  provider = "prisma-client-js"
-  previewFeatures = ["views"]
+  provider      = "prisma-client-js"
+  binaryTargets = ["native", "linux-musl", "darwin-arm64", "linux-musl-openssl-3.0.x"]
 }
 
 datasource db {
@@ -12,74 +9,33 @@ datasource db {
 }
 
 model User {
-  id        String   @id @default(uuid())
-  email     String   @unique
+  id        Int         @id @default(autoincrement())
+  email     String      @unique
   password  String
-  name      String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  trades    Trade[]
-  portfolio Portfolio?
-}
-
-model Stock {
-  id            String   @id @default(uuid())
-  symbol        String   @unique
-  companyName   String
-  currentPrice  Decimal  @db.Decimal(10, 2)
-  lastUpdated   DateTime @default(now())
-  trades        Trade[]
-  portfolioStocks PortfolioStock[]
-}
-
-model Trade {
-  id        String   @id @default(uuid())
-  userId    String
-  stockId   String
-  type      TradeType
-  quantity  Int
-  price     Decimal  @db.Decimal(10, 2)
-  timestamp DateTime @default(now())
-  user      User     @relation(fields: [userId], references: [id])
-  stock     Stock    @relation(fields: [stockId], references: [id])
+  name      String?
+  createdAt DateTime    @default(now())
+  updatedAt DateTime    @updatedAt
+  portfolios Portfolio[]
 }
 
 model Portfolio {
-  id              String   @id @default(uuid())
-  userId          String   @unique
-  totalValue      Decimal  @db.Decimal(10, 2)
-  totalProfit    Decimal  @db.Decimal(10, 2)
-  lastUpdated     DateTime @default(now())
-  user            User     @relation(fields: [userId], references: [id])
-  stocks          PortfolioStock[]
+  id        Int       @id @default(autoincrement())
+  name      String
+  userId    Int
+  user      User      @relation(fields: [userId], references: [id])
+  stocks    Stock[]
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
 }
 
-model PortfolioStock {
-  id          String   @id @default(uuid())
-  portfolioId String
-  stockId     String
+model Stock {
+  id          Int       @id @default(autoincrement())
+  symbol      String
+  name        String
   quantity    Int
-  avgPrice    Decimal  @db.Decimal(10, 2)
-  currentValue Decimal @db.Decimal(10, 2)
-  profit      Decimal  @db.Decimal(10, 2)
+  purchasePrice Float
+  portfolioId Int
   portfolio   Portfolio @relation(fields: [portfolioId], references: [id])
-  stock       Stock    @relation(fields: [stockId], references: [id])
-
-  @@unique([portfolioId, stockId])
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
 }
-
-enum TradeType {
-  BUY
-  SELL
-}
-
-view PortfolioSummary {
-  symbol              String  @unique
-  totalQuantity       Int
-  averagePrice       Float
-  totalInvestment    Float
-  currentPrice       Float?
-  totalValue         Float?
-  profitLoss         Float?
-  profitLossPercent  Float?
-} 
