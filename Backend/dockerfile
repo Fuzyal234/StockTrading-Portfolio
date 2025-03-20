@@ -4,14 +4,24 @@ RUN apt-get update -y && apt-get install -y openssl
 
 WORKDIR /app
 
-COPY package.json package-lock.json ./
+# Install env-cmd globally
+RUN npm install -g env-cmd
+
+# Copy package files
+COPY package*.json ./
 COPY prisma ./prisma/
 
-RUN npm install 
+# Install dependencies
+RUN npm install
+
+# Generate Prisma client
 RUN npx prisma generate
 
+# Copy the rest of the application
 COPY . .
 
 EXPOSE 8001
+EXPOSE 9229
 
+# Start the application
 CMD ["npm", "run", "dev"]
