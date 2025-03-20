@@ -15,27 +15,60 @@ model User {
   name      String?
   createdAt DateTime    @default(now())
   updatedAt DateTime    @updatedAt
-  portfolios Portfolio[]
+  portfolio Portfolio?
+  trades    Trade[]
 }
 
 model Portfolio {
-  id        Int       @id @default(autoincrement())
-  name      String
-  userId    Int
-  user      User      @relation(fields: [userId], references: [id])
-  stocks    Stock[]
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
+  id          Int             @id @default(autoincrement())
+  userId      Int             @unique
+  user        User            @relation(fields: [userId], references: [id])
+  totalValue  Float           @default(0)
+  totalProfit Float           @default(0)
+  lastUpdated DateTime        @updatedAt
+  holdings    PortfolioStock[]
+  createdAt   DateTime        @default(now())
+  updatedAt   DateTime        @updatedAt
 }
 
 model Stock {
-  id          Int       @id @default(autoincrement())
-  symbol      String
-  name        String
-  quantity    Int
-  purchasePrice Float
-  portfolioId Int
-  portfolio   Portfolio @relation(fields: [portfolioId], references: [id])
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
+  id            Int             @id @default(autoincrement())
+  symbol        String          @unique
+  name          String
+  currentPrice  Float
+  lastUpdated   DateTime        @updatedAt
+  holdings      PortfolioStock[]
+  trades        Trade[]
+  createdAt     DateTime        @default(now())
+  updatedAt     DateTime        @updatedAt
+}
+
+model PortfolioStock {
+  id            Int       @id @default(autoincrement())
+  portfolioId   Int
+  stockId       Int
+  quantity      Int
+  avgPrice      Float
+  currentValue  Float
+  profit        Float
+  portfolio     Portfolio @relation(fields: [portfolioId], references: [id])
+  stock         Stock     @relation(fields: [stockId], references: [id])
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  @@unique([portfolioId, stockId])
+}
+
+model Trade {
+  id        Int      @id @default(autoincrement())
+  userId    Int
+  stockId   Int
+  type      String   // "BUY" or "SELL"
+  quantity  Int
+  price     Float
+  timestamp DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id])
+  stock     Stock    @relation(fields: [stockId], references: [id])
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
