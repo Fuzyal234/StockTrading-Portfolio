@@ -10,7 +10,7 @@ import {
   TableContainer,
   Text,
 } from '@chakra-ui/react'
-import { useQuery } from 'react-query'
+import { useQuery } from '@tanstack/react-query'
 
 interface StockHolding {
   symbol: string
