@@ -1,6 +1,6 @@
 # Stock Trading Portfolio
 
-A modern web application for managing and tracking your stock trading portfolio. Built with Next.js, Fastify, and Prisma.
+A modern web application for managing and tracking your stock trading portfolio.
 
 ## Features
 
@@ -8,53 +8,28 @@ A modern web application for managing and tracking your stock trading portfolio.
 - Trade management (buy/sell)
 - Portfolio analytics and charts
 - User authentication
-- Responsive design
 - Dark/Light mode support
 
 ## Tech Stack
 
-### Frontend
-- Next.js 14
-- TypeScript
-- Chakra UI
-- React Query
-- Recharts
-- Axios
+- **Frontend**: Next.js 14, TypeScript, Chakra UI, React Query
+- **Backend**: Fastify, TypeScript, Prisma, PostgreSQL
 
-### Backend
-- Fastify
-- TypeScript
-- Prisma ORM
-- PostgreSQL
-- JWT Authentication
-- Pino Logger
+## Quick Start
 
-## Prerequisites
-
-- Node.js 18+
-- PostgreSQL
-- npm or yarn
-
-## Getting Started
-
-1. Clone the repository:
+1. Clone and install dependencies:
 ```bash
 git clone https://github.com/yourusername/stocktrading-portfolio.git
 cd stocktrading-portfolio
+
+# Frontend
+cd Frontend && npm install
+
+# Backend
+cd ../Backend && npm install
 ```
 
-2. Install dependencies:
-```bash
-# Install frontend dependencies
-cd Frontend
-npm install
-
-# Install backend dependencies
-cd ../Backend
-npm install
-```
-
-3. Set up environment variables:
+2. Set up environment variables:
 ```bash
 # Frontend (.env.local)
 NEXT_PUBLIC_API_URL=http://localhost:8001
@@ -65,25 +40,16 @@ JWT_SECRET="your-secret-key"
 PORT=8001
 ```
 
-4. Set up the database:
+3. Start the servers:
 ```bash
-cd Backend
-npx prisma generate
-npx prisma migrate dev
+# Backend
+cd Backend && npm run dev
+
+# Frontend (new terminal)
+cd Frontend && npm run dev
 ```
 
-5. Start the development servers:
-```bash
-# Start backend server
-cd Backend
-npm run dev
-
-# Start frontend server (in a new terminal)
-cd Frontend
-npm run dev
-```
-
-The application will be available at:
+Access the app at:
 - Frontend: http://localhost:3000
 - Backend: http://localhost:8001
 
@@ -91,24 +57,13 @@ The application will be available at:
 
 ```
 stocktrading-portfolio/
-├── Frontend/
-│   ├── src/
-│   │   ├── app/          # Next.js app directory
-│   │   │   ├── components/   # React components
-│   │   │   ├── hooks/        # Custom React hooks
-│   │   │   ├── lib/          # Utility functions and API client
-│   │   │   └── services/     # API services
-│   │   └── public/           # Static assets
-│   ├── Backend/
-│   │   ├── src/
-│   │   │   ├── controllers/  # Route controllers
-│   │   │   ├── models/       # Data models
-│   │   │   ├── routes/       # API routes
-│   │   │   ├── utils/        # Utility functions
-│   │   │   └── validation/   # Request validation
-│   │   └── prisma/          # Database schema and migrations
-│   └── Dockerization/       # Docker configuration
+├── Frontend/          # Next.js frontend application
+└── Backend/           # Fastify backend with Prisma
 ```
+
+## License
+
+MIT License - see [LICENSE](LICENSE) for details.
 
 ## API Documentation
 
@@ -121,10 +76,6 @@ The API documentation is available at `/api/docs` when running the backend serve
 3. Commit your changes (`git commit -m 'Add some amazing feature'`)
 4. Push to the branch (`git push origin feature/amazing-feature`)
 5. Open a Pull Request
-
-## License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
 ## Acknowledgments
 
