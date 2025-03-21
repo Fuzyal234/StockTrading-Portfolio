@@ -15,7 +15,8 @@ import {
   Container,
 } from '@chakra-ui/react';
 import { useRouter } from 'next/navigation';
-import { authAPI } from '@/services/api';
+import { userService } from '@/services/userService';
+import { portfolioService } from '@/services/portfolioService';
 
 export default function LoginPage() {
   const router = useRouter();
@@ -39,18 +40,36 @@ export default function LoginPage() {
     setIsLoading(true);
 
     try {
-      await authAPI.login(formData);
+      await userService.login(formData);
       toast({
         title: 'Login successful',
         status: 'success',
         duration: 3000,
         isClosable: true,
       });
-      router.push('/dashboard');
+      
+      try {
+        // Get user data after successful login
+        await userService.getCurrentUser();
+        
+        // Get initial portfolio data
+        await portfolioService.getPortfolio();
+        
+        // Redirect to dashboard
+        router.push('/dashboard');
+      } catch (error: any) {
+        toast({
+          title: 'Failed to fetch user data',
+          description: error.response?.data?.error || 'Error fetching user data or portfolio',
+          status: 'error',
+          duration: 3000,
+          isClosable: true,
+        });
+      }
     } catch (error: any) {
       toast({
         title: 'Login failed',
-        description: error.response?.data?.error || 'An error occurred',
+        description: error.response?.data?.error || 'Invalid email or password',
         status: 'error',
         duration: 3000,
         isClosable: true,
@@ -74,6 +93,7 @@ export default function LoginPage() {
                   name="email"
                   value={formData.email}
                   onChange={handleChange}
+                  placeholder="Enter your email"
                 />
               </FormControl>
 
@@ -84,6 +104,7 @@ export default function LoginPage() {
                   name="password"
                   value={formData.password}
                   onChange={handleChange}
+                  placeholder="Enter your password"
                 />
               </FormControl>
 
