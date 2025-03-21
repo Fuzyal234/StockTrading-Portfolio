@@ -22,11 +22,16 @@ interface StockPerformance {
 
 export function PortfolioChart() {
   const { data: holdings } = useQuery<StockPerformance[]>('holdings', async () => {
-    const response = await fetch('http://localhost:8001/api/portfolio')
+    const token = localStorage.getItem('token');
+    const response = await fetch('http://localhost:8001/api/portfolio', {
+      headers: {
+        'Authorization': `Bearer ${token}`
+      }
+    });
     if (!response.ok) {
-      throw new Error('Failed to fetch portfolio data')
+      throw new Error('Failed to fetch portfolio data');
     }
-    return response.json()
+    return response.json();
   })
 
   return (

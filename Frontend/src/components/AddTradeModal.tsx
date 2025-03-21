@@ -25,7 +25,7 @@ interface AddTradeModalProps {
 
 export function AddTradeModal({ isOpen, onClose }: AddTradeModalProps) {
   const [formData, setFormData] = useState({
-    symbol: '',
+    stockId: '',
     type: 'BUY',
     quantity: '',
     price: '',
@@ -34,12 +34,19 @@ export function AddTradeModal({ isOpen, onClose }: AddTradeModalProps) {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     try {
+      const token = localStorage.getItem('token');
       const response = await fetch('http://localhost:8001/api/trades', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
         },
-        body: JSON.stringify(formData),
+        body: JSON.stringify({
+          stockId: formData.stockId,
+          type: formData.type,
+          quantity: Number(formData.quantity),
+          price: Number(formData.price)
+        }),
       })
       if (response.ok) {
         onClose()
@@ -63,8 +70,8 @@ export function AddTradeModal({ isOpen, onClose }: AddTradeModalProps) {
               <FormControl isRequired>
                 <FormLabel>Stock Symbol</FormLabel>
                 <Input
-                  value={formData.symbol}
-                  onChange={(e) => setFormData({ ...formData, symbol: e.target.value.toUpperCase() })}
+                  value={formData.stockId}
+                  onChange={(e) => setFormData({ ...formData, stockId: e.target.value.toUpperCase() })}
                   placeholder="e.g. AAPL"
                 />
               </FormControl>

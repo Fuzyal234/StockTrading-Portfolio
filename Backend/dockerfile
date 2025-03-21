@@ -12,6 +12,9 @@ RUN npx prisma generate
 
 COPY . .
 
+# Create .dockerignore to exclude .env file
+RUN echo ".env" > .dockerignore
+
 EXPOSE 8001
 
 CMD ["npm", "run", "dev"]

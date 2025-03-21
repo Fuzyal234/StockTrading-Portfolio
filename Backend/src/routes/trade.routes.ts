@@ -32,72 +32,64 @@ export async function tradeRoutes(fastify: FastifyInstance) {
 
       try {
         // Create the trade
-        const trade = await prisma.trade.create({
+        const trade = await prisma.Trade.create({
           data: {
             userId,
             stockId,
             type,
             quantity,
-            price
+            price,
+            timestamp: new Date()
           }
         });
 
-        // Update portfolio
-        const portfolio = await prisma.portfolio.findUnique({
+        // Update or create stock in portfolio
+        const portfolio = await prisma.portfolio.findFirst({
           where: { userId }
         });
 
         if (!portfolio) {
+          // Create new portfolio with the stock
           await prisma.portfolio.create({
             data: {
               userId,
-              totalValue: 0,
-              totalProfit: 0,
+              name: 'My Portfolio',
               stocks: {
                 create: {
-                  stockId,
+                  symbol: stockId,
+                  name: stockId,
                   quantity: type === 'BUY' ? quantity : -quantity,
-                  avgPrice: price,
-                  currentValue: price * quantity,
-                  profit: 0
+                  purchasePrice: price
                 }
               }
             }
           });
         } else {
-          // Update existing portfolio
-          const portfolioStock = await prisma.portfolioStock.findUnique({
+          // Update existing stock or create new one
+          const existingStock = await prisma.stock.findFirst({
             where: {
-              portfolioId_stockId: {
-                portfolioId: portfolio.id,
-                stockId
-              }
+              symbol: stockId,
+              portfolioId: portfolio.id
             }
           });
 
-          if (portfolioStock) {
-            const newQuantity = type === 'BUY' 
-              ? portfolioStock.quantity + quantity 
-              : portfolioStock.quantity - quantity;
-
-            await prisma.portfolioStock.update({
-              where: {
-                id: portfolioStock.id
-              },
+          if (existingStock) {
+            await prisma.stock.update({
+              where: { id: existingStock.id },
               data: {
-                quantity: newQuantity,
-                currentValue: newQuantity * price
+                quantity: type === 'BUY' 
+                  ? existingStock.quantity + quantity 
+                  : existingStock.quantity - quantity
               }
             });
           } else {
-            await prisma.portfolioStock.create({
+            await prisma.stock.create({
               data: {
-                portfolioId: portfolio.id,
-                stockId,
+                symbol: stockId,
+                name: stockId,
                 quantity: type === 'BUY' ? quantity : -quantity,
-                avgPrice: price,
-                currentValue: price * quantity,
-                profit: 0
+                purchasePrice: price,
+                portfolioId: portfolio.id
               }
             });
           }
@@ -105,6 +97,7 @@ export async function tradeRoutes(fastify: FastifyInstance) {
 
         reply.code(201).send(trade);
       } catch (error) {
+        console.error('Trade creation error:', error);
         reply.code(500).send({ error: 'Failed to create trade' });
       }
     }
@@ -115,7 +108,7 @@ export async function tradeRoutes(fastify: FastifyInstance) {
     const userId = (request.user as { id: string }).id;
 
     try {
-      const trades = await prisma.trade.findMany({
+      const trades = await prisma.Trade.findMany({
         where: { userId },
         include: {
           stock: true
@@ -137,7 +130,7 @@ export async function tradeRoutes(fastify: FastifyInstance) {
     const userId = (request.user as any).id;
 
     try {
-      const trade = await prisma.trade.findFirst({
+      const trade = await prisma.Trade.findFirst({
         where: {
           id,
           userId
