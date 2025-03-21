@@ -1,5 +1,5 @@
 import { FastifyInstance, FastifyRequest } from 'fastify';
-import { PrismaClient } from '.prisma/client';
+import { PrismaClient } from '@prisma/client';
 import { Type } from '@sinclair/typebox';
 
 const prisma = new PrismaClient();
@@ -32,7 +32,7 @@ export async function tradeRoutes(fastify: FastifyInstance) {
 
       try {
         // Create the trade
-        const trade = await prisma.Trade.create({
+        const trade = await prisma.trade.create({
           data: {
             userId,
             stockId,
@@ -103,12 +103,12 @@ export async function tradeRoutes(fastify: FastifyInstance) {
     }
   });
 
-    // Get all trades for a user
+  // Get all trades for a user
   fastify.get('/', async (request: FastifyRequest, reply) => {
     const userId = (request.user as { id: string }).id;
 
     try {
-      const trades = await prisma.Trade.findMany({
+      const trades = await prisma.trade.findMany({
         where: { userId },
         include: {
           stock: true
@@ -130,7 +130,7 @@ export async function tradeRoutes(fastify: FastifyInstance) {
     const userId = (request.user as any).id;
 
     try {
-      const trade = await prisma.Trade.findFirst({
+      const trade = await prisma.trade.findFirst({
         where: {
           id,
           userId
