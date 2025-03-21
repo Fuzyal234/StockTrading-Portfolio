@@ -13,8 +13,13 @@
     "@chakra-ui/react": "^2.8.2",
     "@emotion/react": "^11.11.3",
     "@emotion/styled": "^11.11.0",
+    "@types/js-cookie": "^3.0.6",
     "axios": "^1.6.7",
+<<<<<<< Updated upstream
     "framer-motion": "^11.0.5",
+=======
+    "js-cookie": "^3.0.5",
+>>>>>>> Stashed changes
     "next": "14.1.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",

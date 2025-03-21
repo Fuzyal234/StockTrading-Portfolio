@@ -5,7 +5,7 @@ generator client {
 
 datasource db {
   provider = "postgresql"
-  url      = env("DATABASE_URL")
+  url      = "postgresql://stock-market-user:postgres@stock-market-db:5432/stock_portfolio"
 }
 
 model User {
