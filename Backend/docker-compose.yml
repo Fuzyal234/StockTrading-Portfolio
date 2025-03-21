@@ -1,0 +1,30 @@
+version: '3.8'
+
+services:
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    environment:
+      - DATABASE_URL=postgresql://stock-market-user:postgres@stock-market-db:5432/stock_portfolio
+    depends_on:
+      - stock-market-db
+    volumes:
+      - .:/app
+      - /app/node_modules
+
+  stock-market-db:
+    image: postgres:15
+    ports:
+      - "5433:5432"
+    environment:
+      - POSTGRES_USER=stock-market-user
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=stock_portfolio
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+volumes:
+  postgres_data: 
