@@ -2,11 +2,12 @@ import api from './api';
 
 export interface Trade {
   id: string;
-  symbol: string;
+  stockId: string;
   quantity: number;
   price: number;
   type: 'BUY' | 'SELL';
   timestamp: string;
+  userId?: string;
 }
 
 export const tradeService = {
@@ -23,7 +24,7 @@ export const tradeService = {
   },
 
   // Create a new trade
-  createTrade: async (tradeData: Omit<Trade, 'id' | 'timestamp'>) => {
+  createTrade: async (tradeData: { stockId: string; type: 'BUY' | 'SELL'; quantity: number; price: number }) => {
     const response = await api.post('/api/trades', tradeData);
     return response.data;
   },

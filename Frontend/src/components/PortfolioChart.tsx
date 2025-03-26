@@ -1,11 +1,14 @@
 'use client'
-import React from 'react'
+import React, { useState } from 'react'
 import {
   Box,
   Heading,
   Select,
   HStack,
   useColorModeValue,
+  Text,
+  Spinner,
+  Center,
 } from '@chakra-ui/react'
 import {
   LineChart,
@@ -18,20 +21,13 @@ import {
   Legend,
 } from 'recharts'
 import { useQuery } from 'react-query'
+import { userService } from '@/services/userService'
+import { useRouter } from 'next/navigation'
 
-interface StockPerformance {
-  symbol: string
-  investment: number
-  currentValue: number
-  profitLoss: number
+interface PerformanceData {
+  date: string;
+  value: number;
 }
-
-const data = [
-  { date: '2024-01', value: 20000 },
-  { date: '2024-02', value: 21500 },
-  { date: '2024-03', value: 22800 },
-  { date: '2024-04', value: 25465 },
-]
 
 const CustomTooltip = ({ active, payload, label }: any) => {
   if (active && payload && payload.length) {
@@ -53,27 +49,89 @@ const CustomTooltip = ({ active, payload, label }: any) => {
 }
 
 export function PortfolioChart() {
-  const { data: holdings } = useQuery<StockPerformance[]>('holdings', async () => {
-    const token = localStorage.getItem('token');
-    const response = await fetch('http://localhost:8001/api/portfolio', {
-      headers: {
-        'Authorization': `Bearer ${token}`
+  const router = useRouter();
+  const [timeframe, setTimeframe] = useState('1M');
+  
+  const { data: performanceData, isLoading, error } = useQuery<PerformanceData[]>(
+    ['portfolio-performance', timeframe],
+    async () => {
+      if (!userService.isAuthenticated()) {
+        router.push('/login');
+        throw new Error('Please login to view your portfolio');
       }
-    });
-    if (!response.ok) {
-      throw new Error('Failed to fetch portfolio data');
+
+      const token = userService.getToken();
+      console.log('Auth token:', token); // Debug token
+
+      try {
+        const response = await fetch(`http://localhost:8001/api/portfolio/performance?timeframe=${timeframe}`, {
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          }
+        });
+
+        if (response.status === 401) {
+          userService.logout();
+          router.push('/login');
+          throw new Error('Session expired. Please login again.');
+        }
+
+        if (!response.ok) {
+          const errorData = await response.json().catch(() => ({}));
+          console.error('API Error:', errorData); // Debug API errors
+          throw new Error(`Failed to fetch performance data: ${response.statusText}`);
+        }
+
+        const data = await response.json();
+        console.log('Performance data:', data); // Debug received data
+        return data;
+      } catch (err) {
+        console.error('Fetch error:', err); // Debug fetch errors
+        if (err instanceof Error) {
+          throw new Error(err.message);
+        }
+        throw new Error('An unexpected error occurred');
+      }
+    },
+    {
+      retry: 1,
+      retryDelay: 1000,
+      onError: (error) => {
+        console.error('Performance data fetch error:', error);
+      }
     }
-    return response.json();
-  })
+  );
 
   const lineColor = useColorModeValue('#3182CE', '#63B3ED')
   const gridColor = useColorModeValue('#E2E8F0', '#2D3748')
+
+  if (isLoading) {
+    return (
+      <Center h="400px">
+        <Spinner size="xl" />
+      </Center>
+    );
+  }
+
+  if (error) {
+    return (
+      <Center h="400px" flexDirection="column" gap={4}>
+        <Text color="red.500">Error loading performance data</Text>
+        <Text fontSize="sm" color="gray.500">{(error as Error).message}</Text>
+      </Center>
+    );
+  }
 
   return (
     <Box>
       <HStack justify="space-between" mb={6}>
         <Heading size="md">Portfolio Performance</Heading>
-        <Select defaultValue="1M" width="120px">
+        <Select
+          value={timeframe}
+          onChange={(e) => setTimeframe(e.target.value)}
+          width="120px"
+        >
           <option value="1D">1 Day</option>
           <option value="1W">1 Week</option>
           <option value="1M">1 Month</option>
@@ -85,7 +143,7 @@ export function PortfolioChart() {
       <Box height="400px">
         <ResponsiveContainer width="100%" height="100%">
           <LineChart
-            data={data}
+            data={performanceData}
             margin={{
               top: 5,
               right: 30,
@@ -102,12 +160,14 @@ export function PortfolioChart() {
             <YAxis
               stroke={useColorModeValue('#4A5568', '#A0AEC0')}
               tick={{ fill: useColorModeValue('#4A5568', '#A0AEC0') }}
+              tickFormatter={(value) => `$${value.toLocaleString()}`}
             />
             <Tooltip content={<CustomTooltip />} />
             <Legend />
             <Line
               type="monotone"
               dataKey="value"
+              name="Portfolio Value"
               stroke={lineColor}
               strokeWidth={2}
               dot={{ fill: lineColor, strokeWidth: 2, r: 4 }}

@@ -7,7 +7,7 @@ services:
     networks:
       - stock-market-network
     ports:
-      - "5432:5432"
+      - "5433:5432"
     environment:
       - POSTGRES_USER=stock-market-user
       - POSTGRES_PASSWORD=postgres
@@ -27,7 +27,7 @@ services:
       - "8001:8001"
       - "9299:9229"
     environment:
-      - DATABASE_URL=postgresql://stock-market-user:postgres@stock-market-db:5432/stock_portfolio
+      - DATABASE_URL=postgresql://stock-market-user:postgres@stock-market-db:5433/stock_portfolio
       - JWT_SECRET=your-secret-key
       - PORT=8001
       - ALPHA_VANTAGE_API_KEY=your-alpha-vantage-api-key

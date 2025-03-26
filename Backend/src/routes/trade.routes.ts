@@ -132,7 +132,7 @@ export async function tradeRoutes(fastify: FastifyInstance) {
     try {
       const trade = await prisma.trade.findFirst({
         where: {
-          id,
+          id: parseInt(id),
           userId
         },
         include: {

@@ -74,7 +74,6 @@ export async function userRoutes(fastify: FastifyInstance) {
       const { email, password } = request.body as any;
 
       try {
-        // Find user by email
         const user = await prisma.user.findUnique({
           where: { email }
         });
@@ -84,21 +83,18 @@ export async function userRoutes(fastify: FastifyInstance) {
           return;
         }
 
-        // Verify password using Argon2
         const isValidPassword = await argon2.verify(user.password, password);
         if (!isValidPassword) {
           reply.code(401).send({ error: 'Invalid credentials' });
           return;
         }
 
-        // Generate JWT token
         const token = fastify.jwt.sign({ 
           id: user.id,
           email: user.email,
           name: user.name
         });
 
-        // Return user data and token (excluding password)
         const { password: _, ...userData } = user;
         reply.send({ user: userData, token });
       } catch (error) {

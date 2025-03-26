@@ -53,7 +53,7 @@ export default function TradeForm() {
       if (!stock) throw new Error('Stock not found');
 
       await tradeService.createTrade({
-        symbol: selectedStock,
+        stockId: selectedStock,
         quantity,
         price: stock.currentPrice,
         type,

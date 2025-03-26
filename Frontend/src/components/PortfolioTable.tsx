@@ -18,6 +18,8 @@ import {
 import { useQuery } from 'react-query'
 import { motion } from 'framer-motion'
 import { FiTrendingUp, FiTrendingDown } from 'react-icons/fi'
+import { userService } from '@/services/userService'
+import { useRouter } from 'next/navigation'
 
 const MotionTr = motion(Tr)
 
@@ -34,17 +36,44 @@ interface StockHolding {
 }
 
 export function PortfolioTable() {
-  const { data: portfolio, isLoading } = useQuery<{ stocks: StockHolding[] }>('holdings', async () => {
-    const token = localStorage.getItem('token');
-    const response = await fetch('http://localhost:8001/api/portfolio', {
-      headers: {
-        'Authorization': `Bearer ${token}`
-      }
-    });
-    if (!response.ok) {
-      throw new Error('Failed to fetch portfolio data');
+  const router = useRouter();
+  
+  const { data: portfolio, isLoading, error } = useQuery<{ stocks: StockHolding[] }>('holdings', async () => {
+    if (!userService.isAuthenticated()) {
+      router.push('/login');
+      throw new Error('Please login to view your portfolio');
     }
-    return response.json();
+
+    try {
+      const response = await fetch('http://localhost:8001/api/portfolio', {
+        headers: {
+          'Authorization': `Bearer ${userService.getToken()}`,
+          'Content-Type': 'application/json'
+        }
+      });
+
+      if (response.status === 401) {
+        userService.logout(); // Clear token
+        router.push('/login');
+        throw new Error('Session expired. Please login again.');
+      }
+
+      if (!response.ok) {
+        throw new Error(`Failed to fetch portfolio data: ${response.statusText}`);
+      }
+
+      return response.json();
+    } catch (err) {
+      if (err instanceof Error) {
+        throw new Error(err.message);
+      }
+      throw new Error('An unexpected error occurred');
+    }
+  }, {
+    retry: false,
+    onError: (error) => {
+      console.error('Portfolio fetch error:', error);
+    }
   });
 
   const bgColor = useColorModeValue('white', 'gray.800')

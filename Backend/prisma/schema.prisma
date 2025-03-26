@@ -30,22 +30,26 @@ model Portfolio {
 }
 
 model Stock {
-  id          Int       @id @default(autoincrement())
-  symbol      String
-  name        String
-  quantity    Int
+  id            Int       @id @default(autoincrement())
+  symbol        String
+  name          String
+  quantity      Int
   purchasePrice Float
-  portfolioId Int
-  portfolio   Portfolio @relation(fields: [portfolioId], references: [id])
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
+  portfolioId   Int
+  portfolio     Portfolio @relation(fields: [portfolioId], references: [id])
+  trades        Trade[]
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  @@unique([portfolioId, symbol])
 }
 
 model Trade {
   id        Int       @id @default(autoincrement())
   userId    Int
   user      User      @relation(fields: [userId], references: [id])
-  stockId   String
+  stockId   Int
+  stock     Stock     @relation(fields: [stockId], references: [id])
   type      String    // "BUY" or "SELL"
   quantity  Int
   price     Float

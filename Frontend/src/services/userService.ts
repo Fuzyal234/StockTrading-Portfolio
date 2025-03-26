@@ -57,6 +57,11 @@ export const userService = {
     return response.data;
   },
 
+  // Get token from cookie
+  getToken: () => {
+    return Cookies.get('token');
+  },
+
   // Register new user
   register: async (userData: RegisterData) => {
     const response = await api.post('/api/users/register', userData);
