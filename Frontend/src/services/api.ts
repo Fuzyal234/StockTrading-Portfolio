@@ -8,6 +8,7 @@ const api = axios.create({
     'Content-Type': 'application/json',
   },
   withCredentials: true
+  withCredentials: true
 });
 
 // Request interceptor for adding auth token
@@ -17,9 +18,14 @@ api.interceptors.request.use((config) => {
     if (!config.headers) {
       config.headers = new axios.AxiosHeaders();
     }
+    if (!config.headers) {
+      config.headers = new axios.AxiosHeaders();
+    }
     config.headers.Authorization = `Bearer ${token}`;
   }
   return config;
+}, (error) => {
+  return Promise.reject(error);
 }, (error) => {
   return Promise.reject(error);
 });
@@ -27,6 +33,7 @@ api.interceptors.request.use((config) => {
 // Response interceptor for handling errors
 api.interceptors.response.use(
   (response) => response,
+  async (error) => {
   async (error) => {
     if (error.response?.status === 401) {
 <<<<<<< Updated upstream
