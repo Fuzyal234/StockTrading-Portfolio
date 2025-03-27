@@ -1,5 +1,5 @@
 'use client'
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import {
   Box,
   Container,
@@ -17,12 +17,16 @@ import {
   Icon,
   Text,
   Badge,
+  Spinner,
+  Center,
 } from '@chakra-ui/react'
 import { motion } from 'framer-motion'
 import { AddTradeModal } from '@/components/AddTradeModal'
 import { PortfolioTable } from '@/components/PortfolioTable'
 import { PortfolioChart } from '@/components/PortfolioChart'
 import { FiTrendingUp, FiDollarSign, FiBarChart2 } from 'react-icons/fi'
+import { useRouter } from 'next/navigation'
+import { userService } from '@/services/userService'
 
 const MotionBox = motion(Box)
 
@@ -30,6 +34,40 @@ export default function Home() {
   const { isOpen, onOpen, onClose } = useDisclosure()
   const bgColor = useColorModeValue('white', 'gray.800')
   const borderColor = useColorModeValue('gray.200', 'gray.700')
+  const router = useRouter()
+  const [isLoading, setIsLoading] = useState(true)
+
+  useEffect(() => {
+    const checkAuth = async () => {
+      try {
+        if (!userService.isAuthenticated()) {
+          const currentPath = window.location.pathname;
+          window.location.href = `/login?from=${encodeURIComponent(currentPath)}`;
+          return;
+        }
+        
+        // Verify token is valid by fetching user data
+        await userService.getCurrentUser();
+        setIsLoading(false);
+      } catch (error) {
+        console.error('Auth check error:', error);
+        // Clear invalid token
+        userService.logout();
+        const currentPath = window.location.pathname;
+        window.location.href = `/login?from=${encodeURIComponent(currentPath)}`;
+      }
+    };
+    
+    checkAuth();
+  }, []);
+
+  if (isLoading) {
+    return (
+      <Center h="100vh">
+        <Spinner size="xl" />
+      </Center>
+    )
+  }
 
   return (
     <Container maxW="container.xl" py={8}>

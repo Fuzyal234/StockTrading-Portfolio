@@ -48,11 +48,11 @@ export async function userRoutes(fastify: FastifyInstance) {
           }
         });
 
-        // Generate JWT tokenS
+        // Generate JWT token
         const token = fastify.jwt.sign({ 
-          id: user.id,
+          id: user.id.toString(),
           email: user.email,
-          name: user.name
+          name: user.name || ''
         });
 
         // Return user data and token (excluding password)
@@ -93,9 +93,9 @@ export async function userRoutes(fastify: FastifyInstance) {
 
         // Generate JWT token
         const token = fastify.jwt.sign({ 
-          id: user.id,
+          id: user.id.toString(),
           email: user.email,
-          name: user.name
+          name: user.name || ''
         });
 
         // Return user data and token (excluding password)
@@ -112,9 +112,8 @@ export async function userRoutes(fastify: FastifyInstance) {
   fastify.get('/me', {
     handler: async (request, reply) => {
       try {
-        await request.jwtVerify();
-        const userId = (request.user as any).id;
-
+        const userId = parseInt(request.user.id);
+        
         const user = await prisma.user.findUnique({
           where: { id: userId },
           select: {
@@ -133,6 +132,7 @@ export async function userRoutes(fastify: FastifyInstance) {
 
         reply.send(user);
       } catch (error) {
+        console.error('Error in /me endpoint:', error);
         reply.code(401).send({ error: 'Unauthorized' });
       }
     }
@@ -148,8 +148,7 @@ export async function userRoutes(fastify: FastifyInstance) {
     },
     handler: async (request, reply) => {
       try {
-        await request.jwtVerify();
-        const userId = (request.user as any).id;
+        const userId = parseInt(request.user.id);
         const { name, password } = request.body as any;
 
         const updateData: any = {};

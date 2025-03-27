@@ -17,6 +17,10 @@ model User {
   updatedAt DateTime    @updatedAt
   portfolios Portfolio[]
   trades    Trade[]
+  watchlists Watchlist[]
+  alerts    Alert[]
+  dividends DividendHistory[]
+  analytics PortfolioAnalytics[]
 }
 
 model Portfolio {
@@ -52,4 +56,55 @@ model Trade {
   timestamp DateTime  @default(now())
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
+}
+
+model Watchlist {
+  id        Int       @id @default(autoincrement())
+  name      String
+  userId    Int
+  user      User      @relation(fields: [userId], references: [id])
+  symbols   String[]  // Array of stock symbols
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+}
+
+model Alert {
+  id        Int       @id @default(autoincrement())
+  userId    Int
+  user      User      @relation(fields: [userId], references: [id])
+  symbol    String
+  type      String    // "PRICE_ABOVE" or "PRICE_BELOW"
+  price     Float
+  active    Boolean   @default(true)
+  triggered Boolean   @default(false)
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+}
+
+model DividendHistory {
+  id           Int      @id @default(autoincrement())
+  userId       Int
+  user         User     @relation(fields: [userId], references: [id])
+  symbol       String
+  amount       Float
+  paymentDate  DateTime
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+model PortfolioAnalytics {
+  id                Int      @id @default(autoincrement())
+  userId           Int
+  user             User     @relation(fields: [userId], references: [id])
+  date             DateTime
+  totalValue       Float
+  cashBalance      Float
+  dayReturn        Float
+  totalReturn      Float
+  sectorAllocation Json     // Stores sector-wise allocation percentages
+  riskMetrics      Json     // Stores various risk metrics (beta, sharpe ratio, etc.)
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  @@unique([userId, date])
 }

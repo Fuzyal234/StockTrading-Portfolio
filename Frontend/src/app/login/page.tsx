@@ -40,36 +40,43 @@ export default function LoginPage() {
     setIsLoading(true);
 
     try {
-      await userService.login(formData);
-      toast({
-        title: 'Login successful',
-        status: 'success',
-        duration: 3000,
-        isClosable: true,
-      });
+      const response = await userService.login(formData);
       
-      try {
-        // Get user data after successful login
-        await userService.getCurrentUser();
-        
-        // Get initial portfolio data
-        await portfolioService.getPortfolio();
-        
-        // Redirect to dashboard
-        router.push('/dashboard');
-      } catch (error: any) {
+      if (response.token) {
         toast({
-          title: 'Failed to fetch user data',
-          description: error.response?.data?.error || 'Error fetching user data or portfolio',
-          status: 'error',
+          title: 'Login successful',
+          status: 'success',
           duration: 3000,
           isClosable: true,
         });
+        
+        // Get the redirect URL from query params
+        const params = new URLSearchParams(window.location.search);
+        const redirectTo = params.get('from') || '/';
+        
+        // Verify the token is valid before redirecting
+        try {
+          await userService.getCurrentUser();
+          // Use window.location.href for a full page reload
+          window.location.href = redirectTo;
+        } catch (error: any) {
+          console.error('Token verification failed:', error);
+          toast({
+            title: 'Session error',
+            description: error.message || 'Please try logging in again',
+            status: 'error',
+            duration: 3000,
+            isClosable: true,
+          });
+        }
+      } else {
+        throw new Error('No token received');
       }
     } catch (error: any) {
+      console.error('Login error:', error);
       toast({
         title: 'Login failed',
-        description: error.response?.data?.error || 'Invalid email or password',
+        description: error.message || 'Invalid email or password',
         status: 'error',
         duration: 3000,
         isClosable: true,
